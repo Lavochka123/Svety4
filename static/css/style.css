@@ -1,0 +1,173 @@
+/* Пример стилей, объединённых из предыдущих примеров */
+
+/* Сброс стилей */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
+
+/* Основной шрифт и базовые настройки */
+body {
+  font-family: 'Montserrat', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  transition: background 0.5s ease-in-out;
+  background: #f0f0f0; /* На случай, если класс не задан */
+}
+
+/* Тематические цвета (фоновый градиент и акцент) */
+body.design_elegant {
+  --bg-color: linear-gradient(135deg, #667eea, #764ba2);
+  --accent-color: #ffea00;
+  background: var(--bg-color);
+}
+body.design_romantic {
+  --bg-color: radial-gradient(circle, #ffafbd, #ffc3a0);
+  --accent-color: #d81b60;
+  background: var(--bg-color);
+}
+body.design_music {
+  --bg-color: linear-gradient(135deg, #7b4397, #dc2430);
+  --accent-color: #ffeb3b;
+  background: var(--bg-color);
+}
+body.design_minimal {
+  --bg-color: #ffffff;
+  --accent-color: #ff5722;
+  background: var(--bg-color);
+}
+
+/* Основной контейнер */
+.container {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  max-width: 600px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  animation: fadeIn 1.2s ease-out;
+}
+
+/* Анимация появления контейнера */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Дизайн конверта */
+.envelope {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto 1.5rem;
+  perspective: 1500px;
+}
+.envelope-flap {
+  width: 100%;
+  height: 0;
+  padding-bottom: 50%;
+  background: linear-gradient(135deg, #ffcc33, #ff9900);
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  transform-origin: top;
+  animation: openFlap 2s forwards;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+@keyframes openFlap {
+  from { transform: rotateX(0deg); }
+  to { transform: rotateX(-180deg); }
+}
+.envelope-body {
+  width: 100%;
+  background: linear-gradient(135deg, #fdf6e3, #fef3d7);
+  border: 2px solid #d4a373;
+  border-radius: 0 0 15px 15px;
+  padding: 1.5rem;
+  opacity: 0;
+  animation: fadeInBody 2s forwards 2s;
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.1);
+}
+@keyframes fadeInBody {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+/* Плавающие сердечки */
+.heart {
+  position: absolute;
+  font-size: 28px;
+  opacity: 0.9;
+  pointer-events: none;
+  animation: floatHeart 4s ease-in-out infinite;
+}
+.heart.heart1 { top: 10%; left: 15%; animation-duration: 3.5s; }
+.heart.heart2 { top: 5%; right: 15%; animation-duration: 4s; }
+.heart.heart3 { bottom: 15%; left: 25%; animation-duration: 5s; }
+@keyframes floatHeart {
+  0% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-20px) scale(1.2); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+/* Стили для содержимого письма */
+.letter-content h1 {
+  font-size: 1.8em;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+.letter-content p {
+  font-size: 1.2em;
+  color: #444;
+  line-height: 1.4;
+}
+
+/* Стили для кнопок */
+.button-container {
+  margin-top: 1.5rem;
+}
+.button {
+  margin: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  background: var(--accent-color, #ff5722);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: 600;
+  transition: background 0.3s, transform 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.button:hover {
+  background: #e6d900;
+  transform: translateY(-3px);
+}
+
+/* Адаптация для мобильных устройств */
+@media (max-width: 600px) {
+  .container {
+    padding: 1rem;
+    width: 95%;
+  }
+  .envelope {
+    max-width: 300px;
+  }
+  .letter-content h1 {
+    font-size: 1.4em;
+  }
+  .letter-content p {
+    font-size: 1em;
+  }
+}
