@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Страница 1</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="{{ data.design }}">
+  <div class="container">
+    <!-- Просто отображаем page1 -->
+    <p>{{ data.page1 }}</p>
+
+    <!-- Кнопка ведёт на 2-ю страницу -->
+    <a href="/invite/{{ data.id }}/page2" class="button">Дальше</a>
+  </div>
+</body>
+</html>

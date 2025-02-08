@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Страница 3</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="{{ data.design }}">
+  <div class="container">
+    <p>{{ data.page3 }}</p>
+
+    <div class="button-container">
+      <button class="button" onclick="handleResponse('no')">Нет</button>
+      <a href="/invite/{{ data.id }}/page4" class="button">Да</a>
+    </div>
+  </div>
+
+  <script>
+    const chatId = "{{ data.chat_id }}";
+    function handleResponse(response) {
+      if (response === 'no') {
+        // AJAX /response
+        fetch('/response', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            chat_id: chatId,
+            response: 'Извини, не могу'
+          })
+        })
+        .then(r => r.json())
+        .then(resp => {
+          if (resp.status === 'ok') {
+            alert("Ваш отказ отправлен!");
+          } else {
+            alert("Ошибка при отправке ответа: " + resp.message);
+          }
+        })
+        .catch(err => {
+          alert("Ошибка: " + err);
+        });
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Страница 4</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="{{ data.design }}">
+  <div class="container">
+    <!-- Показываем строки из data.times -->
+    <form method="POST" action="">
+      <ul>
+        {% for t in data.times %}
+        <li>
+          <label>
+            <input type="radio" name="selected_time" value="{{ t }}" required>
+            {{ t }}
+          </label>
+        </li>
+        {% endfor %}
+      </ul>
+
+      <!-- При сабмите попадём в этот же роут (page4, POST),
+           который потом редиректит на page5. -->
+      <button type="submit" class="button">Подтвердить</button>
+    </form>
+  </div>
+</body>
+</html>
