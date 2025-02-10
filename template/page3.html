@@ -2,29 +2,17 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Страница 3</title>
+  <title>Приглашение — Страница 3</title>
   <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body class="{{ data.design }}">
-  <div class="container">
-    <p>{{ data.page3 }}</p>
-
-    <div class="button-container">
-      <button class="button" onclick="handleResponse('no')">Нет</button>
-      <a href="/invite/{{ data.id }}/page4" class="button">Да</a>
-    </div>
-  </div>
-
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
   <script>
-    const chatId = "{{ data.chat_id }}";
     function handleResponse(response) {
       if (response === 'no') {
-        // AJAX /response
         fetch('/response', {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            chat_id: chatId,
+            chat_id: "{{ data.chat_id }}",
             response: 'Извини, не могу'
           })
         })
@@ -42,5 +30,15 @@
       }
     }
   </script>
+</head>
+<body>
+  <div class="container">
+    <h1>Приглашение</h1>
+    <p>{{ data.page3 }}</p>
+    <div style="margin-top: 20px;">
+      <button class="button" onclick="handleResponse('no')">Нет</button>
+      <a href="/invite/{{ data.id }}/page4" class="button">Да</a>
+    </div>
+  </div>
 </body>
 </html>
