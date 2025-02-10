@@ -2,19 +2,18 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Страница 5</title>
+  <title>Спасибо — Страница 5</title>
   <link rel="stylesheet" href="/static/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 </head>
-<body class="{{ data.design }}">
+<body>
   <div class="container">
-    <h2>Спасибо за ответ!</h2>
+    <h1>Спасибо за ответ!</h1>
     <p>Вы выбрали время: <strong>{{ selected_time }}</strong></p>
-
-    <p>Если хочешь, можешь оставить комментарий:</p>
+    <p>Если хотите, оставьте комментарий:</p>
     <form method="POST" action="/comment">
       <input type="hidden" name="invite_id" value="{{ data.id }}">
-      <textarea name="comment" rows="4" cols="50" placeholder="Оставьте свой комментарий..."></textarea>
-      <br><br>
+      <textarea name="comment" rows="4" style="width: 100%; margin-bottom: 1rem;" placeholder="Оставьте комментарий..."></textarea>
       <button type="submit" class="button">Отправить</button>
     </form>
   </div>
