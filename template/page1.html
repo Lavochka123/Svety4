@@ -2,16 +2,16 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Страница 1</title>
+  <title>Приглашение — Страница 1</title>
   <link rel="stylesheet" href="/static/css/style.css">
+  <!-- Подключаем шрифт Roboto -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 </head>
-<body class="{{ data.design }}">
+<body>
   <div class="container">
-    <!-- Просто отображаем page1 -->
+    <h1>Приглашение</h1>
     <p>{{ data.page1 }}</p>
-
-    <!-- Кнопка ведёт на 2-ю страницу -->
-    <a href="/invite/{{ data.id }}/page2" class="button">Дальше</a>
+    <a href="/invite/{{ data.id }}/page2" class="button">Далее</a>
   </div>
 </body>
 </html>
