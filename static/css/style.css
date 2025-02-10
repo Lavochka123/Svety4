@@ -11,66 +11,103 @@ html {
 /* Основной шрифт и базовые настройки */
 body {
   font-family: 'Montserrat', sans-serif;
+  background: linear-gradient(135deg, #f6e7d7, #f9f0e1); /* тёплый градиент */
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  transition: background 0.5s ease-in-out;
-  background: #f0f0f0;
+  position: relative;
+  overflow-x: hidden;
 }
 
-/* Тематические цвета (фоновый градиент и акцент) */
-body.design_elegant {
-  --bg-color: linear-gradient(135deg, #667eea, #764ba2);
-  --accent-color: #ffea00;
-  background: var(--bg-color);
-}
-body.design_romantic {
-  --bg-color: radial-gradient(circle, #ffafbd, #ffc3a0);
-  --accent-color: #d81b60;
-  background: var(--bg-color);
-}
-body.design_music {
-  --bg-color: linear-gradient(135deg, #7b4397, #dc2430);
-  --accent-color: #ffeb3b;
-  background: var(--bg-color);
-}
-body.design_minimal {
-  --bg-color: #ffffff;
-  --accent-color: #ff5722;
-  background: var(--bg-color);
+/* Фоновый элемент – букет цветов */
+body::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 250px;
+  height: 250px;
+  background: url('/static/images/bouquet.png') no-repeat center center;
+  background-size: contain;
+  opacity: 0.8;
+  z-index: 1;
 }
 
-/* Основной контейнер */
+/* Плавающие сердечки */
+@keyframes floatHeart {
+  0%   { transform: translateY(0) scale(1); opacity: 1; }
+  50%  { transform: translateY(-20px) scale(1.2); opacity: 0.8; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* Для каждого элемента с классом .heart можно задать индивидуальное расположение */
+.heart {
+  position: absolute;
+  font-size: 2rem;
+  color: #e91e63;
+  animation: floatHeart 4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.85;
+}
+/* Примеры позиций (их можно дублировать в HTML, создавая несколько элементов) */
+.heart:nth-of-type(1) { top: 15%; left: 5%; animation-duration: 3.5s; }
+.heart:nth-of-type(2) { top: 30%; right: 5%; animation-duration: 4s; }
+.heart:nth-of-type(3) { bottom: 25%; left: 15%; animation-duration: 5s; }
+.heart:nth-of-type(4) { bottom: 10%; right: 10%; animation-duration: 3.8s; }
+
+/* Основной контейнер для контента */
 .container {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.97);
   border-radius: 15px;
-  padding: 2rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  padding: 2rem 2.5rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   max-width: 600px;
   width: 90%;
   text-align: center;
   position: relative;
-  overflow: hidden;
-  animation: fadeIn 1.2s ease-out;
+  z-index: 10;
 }
 
 /* Отступы для абзацев внутри контейнера */
 .container p {
   margin-bottom: 1.5rem;
   line-height: 1.6;
+  color: #333;
+}
+
+/* Кнопки */
+.button {
+  margin: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  background: #e91e63;
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: 600;
+  transition: background 0.3s, transform 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.button:hover {
+  background: #d81b60;
+  transform: translateY(-3px);
 }
 
 /* Реалистичный дизайн конверта */
 .envelope {
   position: relative;
   width: 100%;
-  max-width: 500px; /* Увеличено для лучшей видимости */
+  max-width: 500px;  /* увеличенный размер для лучшей видимости */
   margin: 2rem auto;
   perspective: 1200px;
+  z-index: 10;
 }
 
-/* Верхняя часть конверта (клапан) */
+/* Верхняя часть (клапан) конверта */
 .envelope-flap {
   position: absolute;
   top: 0;
@@ -80,13 +117,18 @@ body.design_minimal {
   background: linear-gradient(to bottom, #d1a37d, #b68c63);
   border-top-left-radius: 15px;
   border-top-right-radius: 15px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
   transform-origin: top;
   animation: openFlap 2s forwards;
   z-index: 2;
 }
 
-/* Нижняя часть конверта (тело) */
+@keyframes openFlap {
+  from { transform: rotateX(0deg); }
+  to { transform: rotateX(-150deg); }
+}
+
+/* Нижняя часть (тело) конверта */
 .envelope-body {
   position: relative;
   margin-top: 50%;
@@ -100,7 +142,12 @@ body.design_minimal {
   z-index: 1;
 }
 
-/* Элемент-печать для реалистичности */
+@keyframes fadeInBody {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Элемент-печать для конверта */
 .envelope-seal {
   position: absolute;
   top: 40%;
@@ -114,77 +161,14 @@ body.design_minimal {
   z-index: 3;
 }
 
-/* Анимация открытия клапана конверта */
-@keyframes openFlap {
-  from { transform: rotateX(0deg); }
-  to { transform: rotateX(-150deg); }
-}
-
-/* Анимация появления тела конверта */
-@keyframes fadeInBody {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Стили для содержимого письма */
-.letter-content h1 {
-  font-size: 1.8em;
-  margin-bottom: 0.5rem;
-  color: #333;
-}
-.letter-content p {
-  font-size: 1.2em;
-  color: #444;
-  line-height: 1.4;
-}
-
-/* Стили для кнопок */
-.button-container {
-  margin-top: 1.5rem;
-}
-.button {
-  margin: 0.5rem;
-  padding: 0.8rem 1.5rem;
-  background: var(--accent-color, #ff5722);
-  color: #fff;
-  border: none;
-  border-radius: 50px;
-  cursor: pointer;
-  font-size: 1em;
-  font-weight: 600;
-  transition: background 0.3s, transform 0.3s;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-.button:hover {
-  background: #e6d900;
-  transform: translateY(-3px);
-}
-
 /* Адаптация для мобильных устройств */
 @media (max-width: 600px) {
   .container {
-    padding: 1rem;
+    padding: 1.5rem;
     width: 95%;
   }
   .envelope {
     max-width: 90%;
     margin: 2rem auto;
   }
-  .envelope-seal {
-    width: 50px;
-    height: 50px;
-  }
-  .letter-content h1 {
-    font-size: 1.4em;
-  }
-  .letter-content p {
-    font-size: 1em;
-  }
-}
-
-/* Анимация появления основного контейнера */
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
 }
