@@ -2,26 +2,23 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Страница 4</title>
+  <title>Выбор времени — Страница 4</title>
   <link rel="stylesheet" href="/static/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 </head>
-<body class="{{ data.design }}">
+<body>
   <div class="container">
-    <!-- Показываем строки из data.times -->
-    <form method="POST" action="">
-      <ul>
+    <h1>Выбор времени</h1>
+    <form method="POST" action="/invite/{{ data.id }}/page4">
+      <ul style="list-style: none; padding: 0;">
         {% for t in data.times %}
-        <li>
+        <li style="margin-bottom: 1rem;">
           <label>
-            <input type="radio" name="selected_time" value="{{ t }}" required>
-            {{ t }}
+            <input type="radio" name="selected_time" value="{{ t }}" required> {{ t }}
           </label>
         </li>
         {% endfor %}
       </ul>
-
-      <!-- При сабмите попадём в этот же роут (page4, POST),
-           который потом редиректит на page5. -->
       <button type="submit" class="button">Подтвердить</button>
     </form>
   </div>
