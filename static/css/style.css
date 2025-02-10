@@ -1,110 +1,120 @@
-/* Сброс стилей */
+/* ============================= */
+/* Сброс и базовые настройки     */
+/* ============================= */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+
 html {
   scroll-behavior: smooth;
 }
 
-/* Основной шрифт и базовые настройки */
 body {
-  font-family: 'Montserrat', sans-serif;
-  background: linear-gradient(135deg, #f6e7d7, #f9f0e1); /* тёплый градиент */
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(135deg, #fafafa, #f5f5f5);
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  overflow-x: hidden;
+  color: #333;
 }
 
-/* Фоновый элемент – букет цветов */
-body::before {
-  content: "";
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 250px;
-  height: 250px;
-  background: url('/static/images/bouquet.png') no-repeat center center;
-  background-size: contain;
-  opacity: 0.8;
-  z-index: 1;
-}
-
-/* Плавающие сердечки */
-@keyframes floatHeart {
-  0%   { transform: translateY(0) scale(1); opacity: 1; }
-  50%  { transform: translateY(-20px) scale(1.2); opacity: 0.8; }
-  100% { transform: translateY(0) scale(1); opacity: 1; }
-}
-
-/* Для каждого элемента с классом .heart можно задать индивидуальное расположение */
-.heart {
-  position: absolute;
-  font-size: 2rem;
-  color: #e91e63;
-  animation: floatHeart 4s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 2;
-  opacity: 0.85;
-}
-/* Примеры позиций (их можно дублировать в HTML, создавая несколько элементов) */
-.heart:nth-of-type(1) { top: 15%; left: 5%; animation-duration: 3.5s; }
-.heart:nth-of-type(2) { top: 30%; right: 5%; animation-duration: 4s; }
-.heart:nth-of-type(3) { bottom: 25%; left: 15%; animation-duration: 5s; }
-.heart:nth-of-type(4) { bottom: 10%; right: 10%; animation-duration: 3.8s; }
-
-/* Основной контейнер для контента */
+/* ============================= */
+/* Основной контейнер            */
+/* ============================= */
 .container {
-  background: rgba(255, 255, 255, 0.97);
-  border-radius: 15px;
+  background: #fff;
+  border-radius: 8px;
   padding: 2rem 2.5rem;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   max-width: 600px;
-  width: 90%;
+  width: 100%;
   text-align: center;
   position: relative;
   z-index: 10;
 }
 
-/* Отступы для абзацев внутри контейнера */
-.container p {
-  margin-bottom: 1.5rem;
-  line-height: 1.6;
-  color: #333;
+.container h1 {
+  font-size: 2rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
 }
 
-/* Кнопки */
+.container p {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+/* ============================= */
+/* Кнопки                        */
+/* ============================= */
 .button {
-  margin: 0.5rem;
-  padding: 0.8rem 1.5rem;
-  background: #e91e63;
+  background: #4285f4; /* насыщенный синий, характерный для Google */
   color: #fff;
   border: none;
-  border-radius: 50px;
+  border-radius: 4px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
   cursor: pointer;
-  font-size: 1em;
-  font-weight: 600;
-  transition: background 0.3s, transform 0.3s;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-.button:hover {
-  background: #d81b60;
-  transform: translateY(-3px);
+  letter-spacing: 0.03em;
 }
 
-/* Реалистичный дизайн конверта */
+.button:hover {
+  background: #357ae8;
+  box-shadow: 0 4px 12px rgba(66, 133, 244, 0.4);
+}
+
+/* ============================= */
+/* Декоративные элементы         */
+/* ============================= */
+/* Плавающие сердечки (неброские, для дополнительного настроения) */
+.heart {
+  position: absolute;
+  font-size: 1.5rem;
+  color: #e91e63;
+  opacity: 0.8;
+  animation: float 4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 5;
+}
+
+@keyframes float {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
+
+/* Пример позиций для нескольких сердечек */
+.heart:nth-of-type(1) { top: 10%; left: 5%; animation-duration: 4s; }
+.heart:nth-of-type(2) { top: 20%; right: 5%; animation-duration: 5s; }
+.heart:nth-of-type(3) { bottom: 15%; left: 15%; animation-duration: 4.5s; }
+
+/* ============================= */
+/* Элегантный конверт           */
+/* ============================= */
 .envelope {
-  position: relative;
-  width: 100%;
-  max-width: 500px;  /* увеличенный размер для лучшей видимости */
   margin: 2rem auto;
-  perspective: 1200px;
+  max-width: 500px;
+  position: relative;
+  perspective: 1000px;
   z-index: 10;
+}
+
+/* Внутренний блок конверта */
+.envelope-inner {
+  background: #fff;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 2rem;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1;
 }
 
 /* Верхняя часть (клапан) конверта */
@@ -113,59 +123,48 @@ body::before {
   top: 0;
   left: 0;
   width: 100%;
-  height: 50%;
-  background: linear-gradient(to bottom, #d1a37d, #b68c63);
-  border-top-left-radius: 15px;
-  border-top-right-radius: 15px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  height: 0;
+  padding-bottom: 50%;
+  background: #f5f5f5;
+  border: 2px solid #e0e0e0;
+  border-bottom: none;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
   transform-origin: top;
-  animation: openFlap 2s forwards;
+  transition: transform 0.5s ease;
   z-index: 2;
 }
 
-@keyframes openFlap {
-  from { transform: rotateX(0deg); }
-  to { transform: rotateX(-150deg); }
+/* При наведении конверт "открывается" */
+.envelope:hover .envelope-flap {
+  transform: rotateX(-160deg);
 }
 
-/* Нижняя часть (тело) конверта */
-.envelope-body {
-  position: relative;
-  margin-top: 50%;
-  background: #fdf6e3;
-  border: 1px solid #b68c63;
-  border-bottom-left-radius: 15px;
-  border-bottom-right-radius: 15px;
-  padding: 2rem;
-  box-shadow: 0 8px 15px rgba(0,0,0,0.3);
-  animation: fadeInBody 2s forwards 2s;
-  z-index: 1;
-}
-
-@keyframes fadeInBody {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Элемент-печать для конверта */
+/* Элемент-печать (небольшой акцент в центре конверта) */
 .envelope-seal {
   position: absolute;
-  top: 40%;
+  top: 42%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 60px;
   height: 60px;
   background: radial-gradient(circle, #a03c3c, #7f2a2a);
   border-radius: 50%;
-  box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
   z-index: 3;
 }
 
-/* Адаптация для мобильных устройств */
+/* ============================= */
+/* Мобильная адаптация           */
+/* ============================= */
 @media (max-width: 600px) {
   .container {
-    padding: 1.5rem;
+    padding: 1.5rem 1.5rem;
     width: 95%;
+  }
+  .button {
+    width: 100%;
+    padding: 1rem;
   }
   .envelope {
     max-width: 90%;
