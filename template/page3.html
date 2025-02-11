@@ -2,17 +2,43 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Приглашение — Страница 3</title>
-  <link rel="stylesheet" href="/static/css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <title>Страница 3</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    .sender-signature {
+      margin-top: 1rem;
+      font-size: 1.1em;
+      font-weight: 600;
+      text-align: center;
+      color: #333;
+    }
+  </style>
+</head>
+<body class="{{ data.design }}"
+{% if data.bg_image %}
+  style="background-image: url('{{ url_for('static', filename='uploads/' + data.bg_image) }}'); background-size: cover; background-position: center;"
+{% endif %}>
+  <div class="container">
+    <p>{{ data.page3 }}</p>
+    <div class="button-container">
+      <button class="button" onclick="handleResponse('no')">Нет</button>
+      <a href="/invite/{{ data.id }}/page4" class="button">Да</a>
+    </div>
+    {% if data.sender %}
+      <div class="sender-signature">
+         От: {{ data.sender }}
+      </div>
+    {% endif %}
+  </div>
   <script>
+    const chatId = "{{ data.chat_id }}";
     function handleResponse(response) {
       if (response === 'no') {
         fetch('/response', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
-            chat_id: "{{ data.chat_id }}",
+            chat_id: chatId,
             response: 'Извини, не могу'
           })
         })
@@ -21,7 +47,7 @@
           if (resp.status === 'ok') {
             alert("Ваш отказ отправлен!");
           } else {
-            alert("Ошибка при отправке ответа: " + resp.message);
+            alert("Ошибка: " + resp.message);
           }
         })
         .catch(err => {
@@ -30,15 +56,5 @@
       }
     }
   </script>
-</head>
-<body>
-  <div class="container">
-    <h1>Приглашение</h1>
-    <p>{{ data.page3 }}</p>
-    <div style="margin-top: 20px;">
-      <button class="button" onclick="handleResponse('no')">Нет</button>
-      <a href="/invite/{{ data.id }}/page4" class="button">Да</a>
-    </div>
-  </div>
 </body>
 </html>
