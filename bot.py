@@ -12,17 +12,22 @@ from telegram.ext import (
     CallbackQueryHandler,
     MessageHandler,
     filters,
-    ContextTypes
+    ContextTypes,
 )
 
-# Этапы диалога
-DESIGN, PAGE1, PAGE2, PAGE3, TIMES = range(5)
+# Этапы диалога:
+# DESIGN - выбор темы или загрузка фото
+# PHOTO_UPLOAD - загрузка фото для фона (если выбрана опция "Загрузить своё фото")
+# PAGE1, PAGE2, PAGE3 - ввод текста страниц
+# SENDER - ввод имени (или псевдонима) отправителя
+# TIMES - варианты времени для приглашения
+DESIGN, PHOTO_UPLOAD, PAGE1, PAGE2, PAGE3, SENDER, TIMES = range(7)
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 
-PUBLIC_URL = "http://svety.uz"  # Ваш домен
+PUBLIC_URL = "https://svety.uz"  # публичный URL (с HTTPS)
 DB_PATH = "app.db"
 
 def create_table_if_not_exists():
@@ -33,9 +38,11 @@ def create_table_if_not_exists():
         CREATE TABLE IF NOT EXISTS invitations (
             id TEXT PRIMARY KEY,
             design TEXT,
+            bg_image TEXT,
             page1 TEXT,
             page2 TEXT,
             page3 TEXT,
+            sender TEXT,
             times TEXT,
             chat_id TEXT
         )
@@ -43,23 +50,25 @@ def create_table_if_not_exists():
     conn.commit()
     conn.close()
 
-def save_invitation(design, page1, page2, page3, times, chat_id):
+def save_invitation(design, bg_image, page1, page2, page3, sender, times, chat_id):
     """
-    Сохраняет все тексты (page1, page2, page3) + times в БД.
+    Сохраняет данные приглашения в БД.
     Возвращает сгенерированный invite_id (UUID).
     """
     invite_id = str(uuid.uuid4())
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute('''
-        INSERT INTO invitations (id, design, page1, page2, page3, times, chat_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO invitations (id, design, bg_image, page1, page2, page3, sender, times, chat_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
         invite_id,
         design,
+        bg_image,
         page1,
         page2,
         page3,
+        sender,
         "\n".join(times),
         str(chat_id)
     ))
@@ -68,40 +77,71 @@ def save_invitation(design, page1, page2, page3, times, chat_id):
     return invite_id
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Стартовая точка: предлагаем выбрать дизайн."""
+    """Стартовая точка: предлагаем выбрать тему или загрузить своё фото."""
     create_table_if_not_exists()
 
     await update.message.reply_text(
         "Привет! Давай создадим красивое приглашение на свидание!\n\n"
-        "Для начала выбери дизайн открытки:"
+        "Для начала выбери тему оформления или загрузи своё фото для фона:"
     )
     keyboard = [
         [InlineKeyboardButton("🎆 Элегантная ночь", callback_data="design_elegant")],
         [InlineKeyboardButton("🌹 Романтика", callback_data="design_romantic")],
         [InlineKeyboardButton("🎶 Музыка и кино", callback_data="design_music")],
-        [InlineKeyboardButton("💡 Минимализм", callback_data="design_minimal")]
+        [InlineKeyboardButton("💡 Минимализм", callback_data="design_minimal")],
+        [InlineKeyboardButton("🖼 Загрузить своё фото", callback_data="design_custom")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text("Выбери вариант:", reply_markup=reply_markup)
     return DESIGN
 
 async def design_choice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Сохраняем выбранный дизайн, переходим к Page1."""
+    """Сохраняем выбранную тему или переходим к загрузке фото."""
     query = update.callback_query
     await query.answer()
-    context.user_data["design"] = query.data
+    choice = query.data
+    context.user_data["design"] = choice
 
-    await query.edit_message_text(
-        text=(
-            "Отлично! Теперь введи **первую страницу** текста.\n\n"
-            "Например:\n"
-            "«Дорогая Настя! Хочу сказать, что ты... (и т.д.)»"
+    if choice == "design_custom":
+        # Если выбран вариант загрузки фото – просим отправить изображение
+        await query.edit_message_text(
+            text="Пожалуйста, отправь фотографию, которую хочешь использовать в качестве фона."
         )
+        return PHOTO_UPLOAD
+    else:
+        # Для стандартных тем оставляем поле bg_image пустым
+        context.user_data["bg_image"] = ""
+        await query.edit_message_text(
+            text=(
+                "Отлично! Теперь введи **первую страницу** текста.\n\n"
+                "Например:\n"
+                "«Дорогая Настя! Хочу сказать, что ты... (и т.д.)»"
+            )
+        )
+        return PAGE1
+
+async def handle_photo_upload(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """Обрабатываем загруженное фото, сохраняем его и переходим к вводу текста."""
+    if not update.message.photo:
+        await update.message.reply_text("Это не фотография. Пожалуйста, отправь фото.")
+        return PHOTO_UPLOAD
+
+    photo = update.message.photo[-1]  # выбираем фото в наилучшем разрешении
+    file = await photo.get_file()
+    filename = f"{uuid.uuid4()}.jpg"
+    upload_dir = "static/uploads"
+    os.makedirs(upload_dir, exist_ok=True)
+    file_path = os.path.join(upload_dir, filename)
+    await file.download_to_drive(file_path)
+    context.user_data["bg_image"] = filename
+
+    await update.message.reply_text(
+        "Фото успешно загружено! Теперь введи **первую страницу** текста."
     )
     return PAGE1
 
 async def get_page1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Сохраняем введённый текст Page1, переходим к Page2."""
+    """Сохраняем текст первой страницы, переходим ко второй."""
     page1_text = update.message.text.strip()
     context.user_data["page1"] = page1_text
 
@@ -113,7 +153,7 @@ async def get_page1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     return PAGE2
 
 async def get_page2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Сохраняем Page2, переходим к Page3."""
+    """Сохраняем текст второй страницы, переходим к третьей."""
     page2_text = update.message.text.strip()
     context.user_data["page2"] = page2_text
 
@@ -125,12 +165,22 @@ async def get_page2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     return PAGE3
 
 async def get_page3(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Сохраняем Page3, переходим к выбору времени."""
+    """Сохраняем текст третьей страницы, переходим к вводу имени отправителя."""
     page3_text = update.message.text.strip()
     context.user_data["page3"] = page3_text
 
     await update.message.reply_text(
-        "Здорово! Наконец, укажи 3 варианта времени (каждый с новой строки). Например:\n\n"
+        "Прекрасно! Теперь введи своё имя или псевдоним, от кого это письмо."
+    )
+    return SENDER
+
+async def get_sender(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """Сохраняем имя отправителя и переходим к вводу вариантов времени."""
+    sender_text = update.message.text.strip()
+    context.user_data["sender"] = sender_text
+
+    await update.message.reply_text(
+        "Отлично, " + sender_text + "! Теперь укажи 3 варианта времени (каждый с новой строки). Например:\n\n"
         "🕗 19:00 | 21 января\n"
         "🌙 20:30 | 22 января\n"
         "☕ 17:00 | 23 января"
@@ -138,34 +188,33 @@ async def get_page3(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     return TIMES
 
 async def get_times(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Сохраняем варианты времени, генерируем ссылку."""
+    """Сохраняем варианты времени, генерируем ссылку и QR-код."""
     times_text = update.message.text
     times_list = [line.strip() for line in times_text.splitlines() if line.strip()]
 
     design = context.user_data.get("design", "design_elegant")
+    bg_image = context.user_data.get("bg_image", "")
     page1 = context.user_data.get("page1", "")
     page2 = context.user_data.get("page2", "")
     page3 = context.user_data.get("page3", "")
+    sender = context.user_data.get("sender", "")
     chat_id = update.effective_chat.id
 
-    invite_id = save_invitation(design, page1, page2, page3, times_list, chat_id)
+    invite_id = save_invitation(design, bg_image, page1, page2, page3, sender, times_list, chat_id)
 
-    # Формируем короткий URL
     invite_url = f"{PUBLIC_URL}/invite/{invite_id}"
 
-    # Генерация QR-кода
     img = qrcode.make(invite_url)
     img_path = "invite_qr.png"
     img.save(img_path)
 
-    # Отправляем QR-код и ссылку
     with open(img_path, "rb") as photo:
         await update.message.reply_photo(
             photo=photo,
             caption=(
                 f"Приглашение готово!\n\n"
                 f"Вот твоя ссылка: {invite_url}\n\n"
-                f"Отправь её девушке (или покажи QR-код)."
+                f"Отправь её возлюбленной (или покажи QR-код)."
             )
         )
 
@@ -174,7 +223,7 @@ async def get_times(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 def main():
     """Запуск бота."""
-    BOT_TOKEN = "8046219766:AAGFsWXIFTEPe8aaTBimVyWm2au2f-uIYSs"
+    BOT_TOKEN = "8046219766:AAGFsWXIFTEPe8aaTBimVyWm2au2f-uIYSs"  # замените на ваш токен
 
     application = ApplicationBuilder().token(BOT_TOKEN).build()
 
@@ -182,9 +231,11 @@ def main():
         entry_points=[CommandHandler("start", start)],
         states={
             DESIGN: [CallbackQueryHandler(design_choice)],
+            PHOTO_UPLOAD: [MessageHandler(filters.PHOTO, handle_photo_upload)],
             PAGE1: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_page1)],
             PAGE2: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_page2)],
             PAGE3: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_page3)],
+            SENDER: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_sender)],
             TIMES: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_times)]
         },
         fallbacks=[]
