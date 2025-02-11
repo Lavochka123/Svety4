@@ -57,6 +57,12 @@ body.design_minimal {
   animation: fadeIn 1.2s ease-out;
 }
 
+/* Отступы для текста внутри контейнера */
+.container p {
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
 /* Анимация появления контейнера */
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.95); }
@@ -103,6 +109,7 @@ body.design_minimal {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
 /* Плавающие сердечки */
 .heart {
   position: absolute;
@@ -162,7 +169,11 @@ body.design_minimal {
     width: 95%;
   }
   .envelope {
-    max-width: 300px;
+    max-width: 90%;
+    margin: 2rem auto; /* увеличенные отступы для мобильных экранов */
+  }
+  .envelope-body {
+    padding: 2rem; /* увеличенные отступы внутри конверта на мобильных устройствах */
   }
   .letter-content h1 {
     font-size: 1.4em;
