@@ -2,18 +2,84 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Спасибо — Страница 5</title>
-  <link rel="stylesheet" href="/static/css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <title>Страница 5</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    .sender-signature {
+      margin-top: 1rem;
+      font-size: 1.2em;
+      font-weight: bold;
+      text-align: center;
+      color: #333;
+    }
+    /* Пример оформления конверта */
+    .envelope {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+      margin: 1rem auto;
+      perspective: 1500px;
+    }
+    .envelope-flap {
+      width: 100%;
+      height: 0;
+      padding-bottom: 50%;
+      background: linear-gradient(135deg, #ffcc33, #ff9900);
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-top-left-radius: 15px;
+      border-top-right-radius: 15px;
+      transform-origin: top;
+      animation: openFlap 2s forwards;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+    .envelope-body {
+      width: 100%;
+      background: linear-gradient(135deg, #fdf6e3, #fef3d7);
+      border: 2px solid #d4a373;
+      border-radius: 0 0 15px 15px;
+      padding: 1.5rem;
+      animation: fadeInBody 2s forwards 2s;
+      box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+    @keyframes openFlap {
+      from { transform: rotateX(0deg); }
+      to { transform: rotateX(-180deg); }
+    }
+    @keyframes fadeInBody {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
-<body>
+<body class="{{ data.design }}"
+{% if data.bg_image %}
+  style="background-image: url('{{ url_for('static', filename='uploads/' + data.bg_image) }}'); background-size: cover; background-position: center;"
+{% endif %}>
   <div class="container">
-    <h1>Спасибо за ответ!</h1>
+    <!-- Пример конверта с содержимым приглашения -->
+    <div class="envelope">
+      <div class="envelope-flap"></div>
+      <div class="envelope-body">
+         <h2>Приглашение</h2>
+         <p>{{ data.page3 }}</p>
+      </div>
+    </div>
+    <!-- Под конвертом выводим имя отправителя -->
+    {% if data.sender %}
+      <div class="sender-signature">
+         От: {{ data.sender }}
+      </div>
+    {% endif %}
+    
+    <h2>Спасибо за ответ!</h2>
     <p>Вы выбрали время: <strong>{{ selected_time }}</strong></p>
-    <p>Если хотите, оставьте комментарий:</p>
+    <p>Если хотите оставить комментарий, заполните форму ниже:</p>
     <form method="POST" action="/comment">
       <input type="hidden" name="invite_id" value="{{ data.id }}">
-      <textarea name="comment" rows="4" style="width: 100%; margin-bottom: 1rem;" placeholder="Оставьте комментарий..."></textarea>
+      <textarea name="comment" rows="4" cols="50" placeholder="Оставьте комментарий..."></textarea>
+      <br><br>
       <button type="submit" class="button">Отправить</button>
     </form>
   </div>
