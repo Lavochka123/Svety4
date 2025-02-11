@@ -2,15 +2,30 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Детали приглашения — Страница 2</title>
-  <link rel="stylesheet" href="/static/css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <title>Страница 2</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    .sender-signature {
+      margin-top: 1rem;
+      font-size: 1.1em;
+      font-weight: 600;
+      text-align: center;
+      color: #333;
+    }
+  </style>
 </head>
-<body>
+<body class="{{ data.design }}"
+{% if data.bg_image %}
+  style="background-image: url('{{ url_for('static', filename='uploads/' + data.bg_image) }}'); background-size: cover; background-position: center;"
+{% endif %}>
   <div class="container">
-    <h1>Детали приглашения</h1>
     <p>{{ data.page2 }}</p>
-    <a href="/invite/{{ data.id }}/page3" class="button">Далее</a>
+    <a href="/invite/{{ data.id }}/page3" class="button">Дальше</a>
+    {% if data.sender %}
+      <div class="sender-signature">
+         От: {{ data.sender }}
+      </div>
+    {% endif %}
   </div>
 </body>
 </html>
