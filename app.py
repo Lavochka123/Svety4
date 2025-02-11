@@ -13,7 +13,7 @@ DB_PATH = "app.db"
 
 def init_db():
     """
-    Создаёт таблицу invitations (page1, page2, page3, times, design, chat_id), если её нет.
+    Создаёт таблицу invitations (с новыми полями) если её нет.
     """
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
@@ -21,9 +21,11 @@ def init_db():
         CREATE TABLE IF NOT EXISTS invitations (
             id TEXT PRIMARY KEY,
             design TEXT,
+            bg_image TEXT,
             page1 TEXT,
             page2 TEXT,
             page3 TEXT,
+            sender TEXT,
             times TEXT,
             chat_id TEXT
         )
@@ -34,7 +36,6 @@ def init_db():
 init_db()
 
 loop = asyncio.new_event_loop()
-
 def run_loop(loop):
     asyncio.set_event_loop(loop)
     loop.run_forever()
@@ -42,7 +43,6 @@ def run_loop(loop):
 threading.Thread(target=run_loop, args=(loop,), daemon=True).start()
 
 def send_message_sync(chat_id, message):
-    """Отправка в Телеграм через глобальный event loop."""
     future = asyncio.run_coroutine_threadsafe(
         bot.send_message(chat_id=chat_id, text=message),
         loop
@@ -50,30 +50,30 @@ def send_message_sync(chat_id, message):
     return future.result(timeout=10)
 
 def get_invitation(invite_id):
-    """Получаем данные из БД: design, page1, page2, page3, times, chat_id."""
+    """Получаем данные из БД, включая новое поле sender."""
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    c.execute('SELECT design, page1, page2, page3, times, chat_id FROM invitations WHERE id = ?', (invite_id,))
+    c.execute('SELECT design, bg_image, page1, page2, page3, sender, times, chat_id FROM invitations WHERE id = ?', (invite_id,))
     row = c.fetchone()
     conn.close()
     if row:
         return {
             "id": invite_id,
             "design": row[0],
-            "page1": row[1],
-            "page2": row[2],
-            "page3": row[3],
-            "times": row[4].split("\n"),
-            "chat_id": row[5]
+            "bg_image": row[1],
+            "page1": row[2],
+            "page2": row[3],
+            "page3": row[4],
+            "sender": row[5],
+            "times": row[6].split("\n"),
+            "chat_id": row[7]
         }
     return None
 
-# Новый маршрут для перенаправления базового URL приглашения на страницу 1
 @app.route('/invite/<invite_id>')
 def invitation_redirect(invite_id):
     return redirect(url_for('page1', invite_id=invite_id))
 
-# ---------- 1) Страница 1 ----------
 @app.route('/invite/<invite_id>/page1')
 def page1(invite_id):
     data = get_invitation(invite_id)
@@ -81,7 +81,6 @@ def page1(invite_id):
         return "Приглашение не найдено.", 404
     return render_template('page1.html', data=data)
 
-# ---------- 2) Страница 2 ----------
 @app.route('/invite/<invite_id>/page2')
 def page2(invite_id):
     data = get_invitation(invite_id)
@@ -89,7 +88,6 @@ def page2(invite_id):
         return "Приглашение не найдено.", 404
     return render_template('page2.html', data=data)
 
-# ---------- 3) Страница 3 ----------
 @app.route('/invite/<invite_id>/page3')
 def page3(invite_id):
     data = get_invitation(invite_id)
@@ -97,7 +95,6 @@ def page3(invite_id):
         return "Приглашение не найдено.", 404
     return render_template('page3.html', data=data)
 
-# ---------- 4) Страница 4 (выбор времени) ----------
 @app.route('/invite/<invite_id>/page4', methods=['GET', 'POST'])
 def page4(invite_id):
     data = get_invitation(invite_id)
@@ -107,12 +104,10 @@ def page4(invite_id):
     if request.method == 'GET':
         return render_template('page4.html', data=data)
 
-    # POST: пользователь выбрал время
     selected_time = request.form.get('selected_time')
     if not selected_time:
         return "Вы не выбрали время!", 400
 
-    # Отправляем сообщение в Телеграм
     chat_id = data["chat_id"]
     msg = f"Девушка выбрала время: {selected_time}"
     try:
@@ -120,10 +115,8 @@ def page4(invite_id):
     except Exception as e:
         print("Ошибка при отправке сообщения в Telegram:", e)
 
-    # Перенаправляем на страницу 5, передавая выбранное время в URL
     return redirect(url_for('page5', invite_id=invite_id, selected_time=selected_time))
 
-# ---------- 5) Страница 5 (Спасибо + комментарий) ----------
 @app.route('/invite/<invite_id>/page5', methods=['GET'])
 def page5(invite_id):
     data = get_invitation(invite_id)
@@ -133,7 +126,6 @@ def page5(invite_id):
     selected_time = request.args.get('selected_time', '')
     return render_template('page5.html', data=data, selected_time=selected_time)
 
-# ---------- Кнопка "Извини, не могу" (AJAX) ----------
 @app.route('/response', methods=['POST'])
 def response():
     req_data = request.get_json()
@@ -148,7 +140,6 @@ def response():
 
     return jsonify({"status": "ok"}), 200
 
-# ---------- Обработка комментария ----------
 @app.route('/comment', methods=['POST'])
 def comment():
     invite_id = request.form.get('invite_id')
