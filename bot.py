@@ -3,6 +3,8 @@ import os
 import qrcode
 import sqlite3
 import uuid
+import asyncio
+import threading
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
@@ -15,12 +17,7 @@ from telegram.ext import (
     ContextTypes,
 )
 
-# Этапы диалога:
-# DESIGN - выбор темы или загрузка фото
-# PHOTO_UPLOAD - загрузка фото для фона (если выбрана опция "Загрузить своё фото")
-# PAGE1, PAGE2, PAGE3 - ввод текста страниц
-# SENDER - ввод имени (или псевдонима) отправителя
-# TIMES - варианты времени для приглашения
+# Состояния диалога:
 DESIGN, PHOTO_UPLOAD, PAGE1, PAGE2, PAGE3, SENDER, TIMES = range(7)
 
 logging.basicConfig(
@@ -29,6 +26,10 @@ logging.basicConfig(
 
 PUBLIC_URL = "https://svety.uz"  # публичный URL (с HTTPS)
 DB_PATH = "app.db"
+
+# Замените токен на ваш
+TELEGRAM_BOT_TOKEN = "8046219766:YOUR_BOT_TOKEN"
+bot =  __import__("telegram").Bot(token=TELEGRAM_BOT_TOKEN)
 
 def create_table_if_not_exists():
     """Создаёт таблицу invitations с нужными полями, если её нет."""
@@ -55,12 +56,9 @@ create_table_if_not_exists()
 # Создаем новый event loop для работы с асинхронными операциями Telegram
 loop = asyncio.new_event_loop()
 def run_loop(loop):
-    import asyncio
     asyncio.set_event_loop(loop)
     loop.run_forever()
 
-import asyncio
-import threading
 threading.Thread(target=run_loop, args=(loop,), daemon=True).start()
 
 def send_message_sync(chat_id, message):
@@ -135,7 +133,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     return DESIGN
 
 async def design_choice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Сохраняем выбранную тему. Если выбрано 'Загрузить своё фото' - переходим к загрузке, иначе устанавливаем фон из предопределённого набора."""
+    """Сохраняем выбранную тему. Если выбран 'Загрузить своё фото' – переходим к загрузке, иначе устанавливаем фон из предопределённого набора."""
     query = update.callback_query
     await query.answer()
     choice = query.data
@@ -147,13 +145,12 @@ async def design_choice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
         )
         return PHOTO_UPLOAD
     else:
-        # Предопределенные фоны для выбранных тем (администратор добавляет эти фото в папку static/designs)
+        # Задаем пути к заранее добавленным фотографиям для встроенных тем (администратор добавляет эти фото в папку static/designs)
         predefined_bg_images = {
             "design_elegant": "designs/elegant.jpg",
             "design_romantic": "designs/romantic.jpg",
             "design_music": "designs/music.jpg"
         }
-        # Устанавливаем значение bg_image из словаря для выбранного дизайна
         context.user_data["bg_image"] = predefined_bg_images.get(choice, "")
         await query.edit_message_text(
             text=(
@@ -177,7 +174,7 @@ async def handle_photo_upload(update: Update, context: ContextTypes.DEFAULT_TYPE
     os.makedirs(upload_dir, exist_ok=True)
     file_path = os.path.join(upload_dir, filename)
     await file.download_to_drive(file_path)
-    context.user_data["bg_image"] = "uploads/" + filename  # сохраняем путь относительно static/
+    context.user_data["bg_image"] = "uploads/" + filename  # путь относительно static/
 
     await update.message.reply_text(
         "Фото успешно загружено! Теперь введи **первую страницу** текста."
@@ -268,9 +265,7 @@ async def get_times(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     return ConversationHandler.END
 
 def main():
-    """Запуск бота."""
-    BOT_TOKEN = "8046219766:AAGFsWXIFTEPe8aaTBimVyWm2au2f-uIYSs"  # замените на ваш токен
-
+    BOT_TOKEN = "8046219766:AAGFsWXIFTEPe8aaTBimVyWm2au2f-uIYSs"  # Замените на ваш токен
     application = ApplicationBuilder().token(BOT_TOKEN).build()
 
     conv_handler = ConversationHandler(
