@@ -8,7 +8,7 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Основной шрифт и базовые настройки */
+/* Основной шрифт и базовые настройки для всех устройств */
 body {
   font-family: 'Montserrat', sans-serif;
   display: flex;
@@ -16,8 +16,8 @@ body {
   justify-content: center;
   min-height: 100vh;
   transition: background 0.5s ease-in-out;
-  background: #f0f0f0; /* На случай, если класс не задан */
-  font-size: 16px;
+  background: #f0f0f0;
+  font-size: 40px; /* увеличенный базовый размер шрифта */
 }
 
 /* Тематические цвета (фоновый градиент и акцент) */
@@ -42,14 +42,19 @@ body.design_minimal {
   background: var(--bg-color);
 }
 
-/* Основной контейнер */
+/* Основной контейнер (всплывающее окно) – увеличенное по горизонтали на 50% и по вертикали на 300% */
 .container {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 15px;
-  padding: 2rem;
+  padding: 3rem;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  max-width: 600px;
-  width: 90%;
+  width: 135vw;    /* 50% больше, чем 90vw */
+  height: 180vh;   /* 300% от исходного значения (например, если было 60vh, теперь 180vh) */
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -58,8 +63,10 @@ body.design_minimal {
 
 /* Отступы для текста внутри контейнера */
 .container p {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2.5rem;
+  font-size: 2.5em;
   line-height: 1.6;
+  text-align: center;
 }
 
 /* Анимация появления контейнера */
@@ -71,9 +78,9 @@ body.design_minimal {
 /* Дизайн конверта */
 .envelope {
   position: relative;
-  width: 100%;
-  max-width: 400px;
-  margin: 0 auto 1.5rem;
+  width: 135vw;
+  max-width: 135vw;
+  margin: 3rem auto;
   perspective: 1500px;
 }
 .envelope-flap {
@@ -99,7 +106,7 @@ body.design_minimal {
   background: linear-gradient(135deg, #fdf6e3, #fef3d7);
   border: 2px solid #d4a373;
   border-radius: 0 0 15px 15px;
-  padding: 1.5rem;
+  padding: 3rem;
   opacity: 0;
   animation: fadeInBody 2s forwards 2s;
   box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.1);
@@ -128,12 +135,12 @@ body.design_minimal {
 
 /* Стили для содержимого письма */
 .letter-content h1 {
-  font-size: 1.8em;
+  font-size: 2.5em;
   margin-bottom: 0.5rem;
   color: #333;
 }
 .letter-content p {
-  font-size: 1.2em;
+  font-size: 2em;
   color: #444;
   line-height: 1.4;
 }
@@ -144,13 +151,13 @@ body.design_minimal {
 }
 .button {
   margin: 0.5rem;
-  padding: 0.8rem 1.5rem;
+  padding: 2rem 3.75rem;
   background: var(--accent-color, #ff5722);
   color: #fff;
   border: none;
   border-radius: 50px;
   cursor: pointer;
-  font-size: 1em;
+  font-size: 2.5em;
   font-weight: 600;
   transition: background 0.3s, transform 0.3s;
   text-transform: uppercase;
@@ -163,59 +170,10 @@ body.design_minimal {
 
 /* Стили для подписи отправителя */
 .sender-signature {
-  margin-top: 1rem;
-  font-size: 1em;
+  margin-top: 3rem;
+  font-size: 2.5em;
   font-weight: bold;
   text-align: center;
   color: #333;
-}
-
-/* Мобильная версия: увеличенное окно и пропорциональное масштабирование элементов */
-@media (max-width: 600px) {
-  /* Увеличение контейнера:
-     - По горизонтали: 90vw * 1.5 = 135vw (на 50% больше)
-     - По вертикали: задаём явно 180vh (примерно 3 раза больше, чем 60vh) */
-  .container {
-    width: 135vw;
-    height: 180vh;
-    padding: 3rem;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-  /* Увеличение размера текста */
-  .container p {
-    margin-bottom: 2.5rem;
-    font-size: 2.5em;
-    text-align: center;
-  }
-  /* Кнопки увеличиваются пропорционально */
-  .button {
-    padding: 2rem 3.75rem;
-    font-size: 2.5em;
-  }
-  /* Увеличение размеров конверта */
-  .envelope {
-    width: 135vw;
-    max-width: 135vw;
-    margin: 3rem auto;
-  }
-  .envelope-body {
-    padding: 3rem;
-  }
-  /* Размеры для содержимого письма */
-  .letter-content h1 {
-    font-size: 2.5em;
-  }
-  .letter-content p {
-    font-size: 2em;
-  }
-  /* Увеличение подписи отправителя с дополнительным отступом, чтобы не накладывалась на кнопку */
-  .sender-signature {
-    margin-top: 3rem;
-    font-size: 2.5em;
-    display: block;
-  }
+  display: block;
 }
