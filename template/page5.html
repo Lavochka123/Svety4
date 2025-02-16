@@ -5,13 +5,6 @@
   <title>Страница 5</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <style>
-    .sender-signature {
-      margin-top: 1rem;
-      font-size: 1.2em;
-      font-weight: bold;
-      text-align: center;
-      color: #333;
-    }
     /* Пример оформления конверта */
     .envelope {
       position: relative;
@@ -55,10 +48,9 @@
 </head>
 <body class="{{ data.design }}"
 {% if data.bg_image %}
-  style="background-image: url('{{ url_for('static', filename='uploads/' + data.bg_image) }}'); background-size: cover; background-position: center;"
+  style="background-image: url('{{ url_for('static', filename=data.bg_image) }}'); background-size: cover; background-position: center;"
 {% endif %}>
   <div class="container">
-    <!-- Пример конверта с содержимым приглашения -->
     <div class="envelope">
       <div class="envelope-flap"></div>
       <div class="envelope-body">
@@ -66,13 +58,11 @@
          <p>{{ data.page3 }}</p>
       </div>
     </div>
-    <!-- Под конвертом выводим имя отправителя -->
     {% if data.sender %}
       <div class="sender-signature">
          От: {{ data.sender }}
       </div>
     {% endif %}
-    
     <h2>Спасибо за ответ!</h2>
     <p>Вы выбрали время: <strong>{{ selected_time }}</strong></p>
     <p>Если хотите оставить комментарий, заполните форму ниже:</p>
