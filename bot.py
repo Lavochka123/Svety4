@@ -50,6 +50,48 @@ def create_table_if_not_exists():
     conn.commit()
     conn.close()
 
+create_table_if_not_exists()
+
+# Создаем новый event loop для работы с асинхронными операциями Telegram
+loop = asyncio.new_event_loop()
+def run_loop(loop):
+    import asyncio
+    asyncio.set_event_loop(loop)
+    loop.run_forever()
+
+import asyncio
+import threading
+threading.Thread(target=run_loop, args=(loop,), daemon=True).start()
+
+def send_message_sync(chat_id, message):
+    """Отправляет сообщение в Telegram, используя глобальный event loop."""
+    future = asyncio.run_coroutine_threadsafe(
+        bot.send_message(chat_id=chat_id, text=message),
+        loop
+    )
+    return future.result(timeout=10)
+
+def get_invitation(invite_id):
+    """Получает данные приглашения из БД и возвращает их в виде словаря."""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute('SELECT design, bg_image, page1, page2, page3, sender, times, chat_id FROM invitations WHERE id = ?', (invite_id,))
+    row = c.fetchone()
+    conn.close()
+    if row:
+        return {
+            "id": invite_id,
+            "design": row[0],
+            "bg_image": row[1],
+            "page1": row[2],
+            "page2": row[3],
+            "page3": row[4],
+            "sender": row[5],
+            "times": row[6].split("\n"),
+            "chat_id": row[7]
+        }
+    return None
+
 def save_invitation(design, bg_image, page1, page2, page3, sender, times, chat_id):
     """
     Сохраняет данные приглашения в БД.
@@ -77,9 +119,7 @@ def save_invitation(design, bg_image, page1, page2, page3, sender, times, chat_i
     return invite_id
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Стартовая точка: предлагаем выбрать тему или загрузить своё фото."""
-    create_table_if_not_exists()
-
+    """Стартовая точка: предлагаем выбрать тему оформления или загрузить своё фото."""
     await update.message.reply_text(
         "Привет! Давай создадим красивое приглашение на свидание!\n\n"
         "Для начала выбери тему оформления или загрузи своё фото для фона:"
@@ -88,7 +128,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         [InlineKeyboardButton("🎆 Элегантная ночь", callback_data="design_elegant")],
         [InlineKeyboardButton("🌹 Романтика", callback_data="design_romantic")],
         [InlineKeyboardButton("🎶 Музыка и кино", callback_data="design_music")],
-        [InlineKeyboardButton("💡 Минимализм", callback_data="design_minimal")],
         [InlineKeyboardButton("🖼 Загрузить своё фото", callback_data="design_custom")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -96,21 +135,26 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     return DESIGN
 
 async def design_choice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Сохраняем выбранную тему или переходим к загрузке фото."""
+    """Сохраняем выбранную тему. Если выбрано 'Загрузить своё фото' - переходим к загрузке, иначе устанавливаем фон из предопределённого набора."""
     query = update.callback_query
     await query.answer()
     choice = query.data
     context.user_data["design"] = choice
 
     if choice == "design_custom":
-        # Если выбран вариант загрузки фото – просим отправить изображение
         await query.edit_message_text(
             text="Пожалуйста, отправь фотографию, которую хочешь использовать в качестве фона."
         )
         return PHOTO_UPLOAD
     else:
-        # Для стандартных тем оставляем поле bg_image пустым
-        context.user_data["bg_image"] = ""
+        # Предопределенные фоны для выбранных тем (администратор добавляет эти фото в папку static/designs)
+        predefined_bg_images = {
+            "design_elegant": "designs/elegant.jpg",
+            "design_romantic": "designs/romantic.jpg",
+            "design_music": "designs/music.jpg"
+        }
+        # Устанавливаем значение bg_image из словаря для выбранного дизайна
+        context.user_data["bg_image"] = predefined_bg_images.get(choice, "")
         await query.edit_message_text(
             text=(
                 "Отлично! Теперь введи **первую страницу** текста.\n\n"
@@ -133,7 +177,7 @@ async def handle_photo_upload(update: Update, context: ContextTypes.DEFAULT_TYPE
     os.makedirs(upload_dir, exist_ok=True)
     file_path = os.path.join(upload_dir, filename)
     await file.download_to_drive(file_path)
-    context.user_data["bg_image"] = filename
+    context.user_data["bg_image"] = "uploads/" + filename  # сохраняем путь относительно static/
 
     await update.message.reply_text(
         "Фото успешно загружено! Теперь введи **первую страницу** текста."
@@ -180,7 +224,7 @@ async def get_sender(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     context.user_data["sender"] = sender_text
 
     await update.message.reply_text(
-        "Отлично, " + sender_text + "! Теперь укажи 3 варианта времени (каждый с новой строки). Например:\n\n"
+        f"Отлично, {sender_text}! Теперь укажи 3 варианта времени (каждый с новой строки). Например:\n\n"
         "🕗 19:00 | 21 января\n"
         "🌙 20:30 | 22 января\n"
         "☕ 17:00 | 23 января"
@@ -202,8 +246,10 @@ async def get_times(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
     invite_id = save_invitation(design, bg_image, page1, page2, page3, sender, times_list, chat_id)
 
+    # Формируем URL приглашения
     invite_url = f"{PUBLIC_URL}/invite/{invite_id}"
 
+    # Генерируем QR-код
     img = qrcode.make(invite_url)
     img_path = "invite_qr.png"
     img.save(img_path)
