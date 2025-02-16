@@ -161,41 +161,57 @@ body.design_minimal {
   transform: translateY(-3px);
 }
 
+/* Стили для подписи отправителя */
+.sender-signature {
+  margin-top: 1rem;
+  font-size: 1em;
+  font-weight: bold;
+  text-align: center;
+  color: #333;
+}
+
 /* Адаптация для мобильных устройств */
 @media (max-width: 600px) {
-  /* Увеличиваем базовый размер шрифта */
+  /* Увеличиваем базовый размер шрифта в 2,5 раза (от 16px до 40px) */
   body {
-    font-size: 30px;
+    font-size: 40px;
   }
-  /* Контейнер теперь занимает всю ширину и имеет увеличенные отступы */
+  /* Контейнер: увеличиваем padding и делаем его шире */
   .container {
-    padding: 3.75rem;
+    padding: 5rem;
     width: 100%;
     max-width: none;
   }
-  /* Абзацы текста: увеличиваем отступ снизу и размер шрифта */
+  /* Абзацы: увеличиваем отступ снизу и размер шрифта */
   .container p {
-    margin-bottom: 3.75rem;
-    font-size: 1.5em;
+    margin-bottom: 4rem;
+    font-size: 2.5em;
   }
-  /* Кнопки становятся больше для удобства нажатия */
+  /* Кнопки: увеличиваем размеры и отступы */
   .button {
-    padding: 1.8rem 3.75rem;
-    font-size: 1.8em;
+    padding: 2rem 3.75rem;
+    font-size: 2.5em;
   }
   /* Увеличиваем размеры конверта */
   .envelope {
-    max-width: 100%;
-    margin: 3rem auto;
+    width: 100%;
+    max-width: none;
+    margin: 4rem auto;
   }
   .envelope-body {
-    padding: 3rem;
+    padding: 4rem;
   }
-  /* Размеры текста в блоке содержимого письма */
+  /* Размеры для содержимого письма */
   .letter-content h1 {
-    font-size: 2em;
+    font-size: 2.5em;
   }
   .letter-content p {
-    font-size: 1.5em;
+    font-size: 2em;
+  }
+  /* Подпись отправителя: увеличиваем отступ сверху и размер шрифта, чтобы не накладывалась на кнопку */
+  .sender-signature {
+    margin-top: 2.5rem;
+    font-size: 2.5em;
+    display: block;
   }
 }
