@@ -163,34 +163,38 @@ body.design_minimal {
 
 /* Адаптация для мобильных устройств */
 @media (max-width: 600px) {
-  /* Увеличиваем базовый размер шрифта для лучшей читаемости */
+  /* Увеличиваем базовый размер шрифта */
   body {
-    font-size: 18px;
+    font-size: 20px;
   }
+  /* Делает контейнер шире и убирает ограничение max-width */
   .container {
-    padding: 1.5rem;
-    width: 95%;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: none;
   }
-  /* Увеличиваем отступы между элементами */
+  /* Увеличиваем отступы для абзацев и делаем шрифт крупнее */
   .container p {
-    margin-bottom: 2rem;
-    font-size: 1.1em;
+    margin-bottom: 2.5rem;
+    font-size: 1.3em;
   }
+  /* Крупнее кнопки */
   .button {
-    padding: 1rem 2rem;
-    font-size: 1.2em;
+    padding: 1.2rem 2.5rem;
+    font-size: 1.4em;
   }
+  /* Увеличиваем размеры конверта */
   .envelope {
-    max-width: 90%;
+    max-width: 100%;
     margin: 2rem auto;
   }
   .envelope-body {
-    padding: 2rem;
+    padding: 2.5rem;
   }
   .letter-content h1 {
-    font-size: 1.6em;
+    font-size: 1.8em;
   }
   .letter-content p {
-    font-size: 1.2em;
+    font-size: 1.3em;
   }
 }
