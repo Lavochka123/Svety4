@@ -42,7 +42,7 @@ body.design_minimal {
   background: var(--bg-color);
 }
 
-/* Основной контейнер (всплывающее окно) */
+/* Основной контейнер */
 .container {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 15px;
@@ -170,72 +170,50 @@ body.design_minimal {
   color: #333;
 }
 
-/* Адаптация для мобильных устройств */
+/* Мобильная версия: увеличенное окно, шрифты и отступы */
 @media (max-width: 600px) {
-  /* Увеличиваем всплывающее окно до 80–90% ширины и 50–60% высоты экрана */
+  /* Увеличение всплывающего окна до 90% ширины экрана и 60% высоты */
   .container {
-    width: 90%;
-    height: 55vh;
-    padding: 2rem;
-    margin: 2rem auto;
+    width: 90vw;
+    height: 60vh;
+    padding: 2.5rem;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
   }
-  
-  /* Масштабирование текста внутри контейнера */
+  /* Увеличение размера текста */
   .container p {
-    font-size: 1.5em;
-    margin-bottom: 1.5rem;
-    line-height: 1.6;
+    margin-bottom: 2rem;
+    font-size: 2.5em;
+    text-align: center;
   }
-  
+  /* Увеличение размера кнопок */
+  .button {
+    padding: 1.8rem 3.75rem;
+    font-size: 2.5em;
+  }
+  /* Увеличение размеров конверта */
+  .envelope {
+    width: 90vw;
+    max-width: 90vw;
+    margin: 2rem auto;
+  }
+  .envelope-body {
+    padding: 3rem;
+  }
+  /* Увеличение размеров текста для содержимого письма */
   .letter-content h1 {
+    font-size: 2.5em;
+  }
+  .letter-content p {
     font-size: 2em;
   }
-  
-  /* Кнопки – увеличиваем размер и отступы, чтобы они не накладывались на подпись */
-  .button {
-    padding: 1.5rem 2.5rem;
-    font-size: 1.8em;
-    margin: 1rem 0.5rem;
-  }
-  
-  /* Подпись отправителя – добавляем дополнительный отступ сверху */
-  .sender-signature {
-    margin-top: 2rem;
-    font-size: 1.8em;
-    display: block;
-  }
-  
-  /* Дополнительное увеличение окна и текста (умножение примерно в 2,5 раза относительно базового) */
-  body {
-    font-size: 40px;
-  }
-  .container {
-    padding: 5rem;
-    height: 60vh;
-  }
-  .container p {
-    font-size: 2.5em;
-    margin-bottom: 4rem;
-  }
-  .button {
-    padding: 2rem 3.75rem;
-    font-size: 2.5em;
-  }
+  /* Увеличение отступа для подписи отправителя, чтобы она не накладывалась на кнопку */
   .sender-signature {
     margin-top: 2.5rem;
     font-size: 2.5em;
-  }
-  
-  /* Увеличиваем размеры конверта, если используется */
-  .envelope {
-    max-width: 100%;
-    margin: 4rem auto;
-  }
-  .envelope-body {
-    padding: 4rem;
+    display: block;
   }
 }
