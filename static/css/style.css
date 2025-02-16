@@ -170,13 +170,15 @@ body.design_minimal {
   color: #333;
 }
 
-/* Мобильная версия: увеличенное окно, шрифты и отступы */
+/* Мобильная версия: увеличенное окно и пропорциональное масштабирование элементов */
 @media (max-width: 600px) {
-  /* Увеличение всплывающего окна до 90% ширины экрана и 60% высоты */
+  /* Увеличение контейнера:
+     - По горизонтали: 90vw * 1.5 = 135vw (на 50% больше)
+     - По вертикали: задаём явно 180vh (примерно 3 раза больше, чем 60vh) */
   .container {
-    width: 90vw;
-    height: 60vh;
-    padding: 2.5rem;
+    width: 135vw;
+    height: 180vh;
+    padding: 3rem;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -185,34 +187,34 @@ body.design_minimal {
   }
   /* Увеличение размера текста */
   .container p {
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
     font-size: 2.5em;
     text-align: center;
   }
-  /* Увеличение размера кнопок */
+  /* Кнопки увеличиваются пропорционально */
   .button {
-    padding: 1.8rem 3.75rem;
+    padding: 2rem 3.75rem;
     font-size: 2.5em;
   }
   /* Увеличение размеров конверта */
   .envelope {
-    width: 90vw;
-    max-width: 90vw;
-    margin: 2rem auto;
+    width: 135vw;
+    max-width: 135vw;
+    margin: 3rem auto;
   }
   .envelope-body {
     padding: 3rem;
   }
-  /* Увеличение размеров текста для содержимого письма */
+  /* Размеры для содержимого письма */
   .letter-content h1 {
     font-size: 2.5em;
   }
   .letter-content p {
     font-size: 2em;
   }
-  /* Увеличение отступа для подписи отправителя, чтобы она не накладывалась на кнопку */
+  /* Увеличение подписи отправителя с дополнительным отступом, чтобы не накладывалась на кнопку */
   .sender-signature {
-    margin-top: 2.5rem;
+    margin-top: 3rem;
     font-size: 2.5em;
     display: block;
   }
