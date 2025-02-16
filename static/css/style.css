@@ -165,36 +165,37 @@ body.design_minimal {
 @media (max-width: 600px) {
   /* Увеличиваем базовый размер шрифта */
   body {
-    font-size: 20px;
+    font-size: 30px;
   }
-  /* Делает контейнер шире и убирает ограничение max-width */
+  /* Контейнер теперь занимает всю ширину и имеет увеличенные отступы */
   .container {
-    padding: 2.5rem;
+    padding: 3.75rem;
     width: 100%;
     max-width: none;
   }
-  /* Увеличиваем отступы для абзацев и делаем шрифт крупнее */
+  /* Абзацы текста: увеличиваем отступ снизу и размер шрифта */
   .container p {
-    margin-bottom: 2.5rem;
-    font-size: 1.3em;
+    margin-bottom: 3.75rem;
+    font-size: 1.5em;
   }
-  /* Крупнее кнопки */
+  /* Кнопки становятся больше для удобства нажатия */
   .button {
-    padding: 1.2rem 2.5rem;
-    font-size: 1.4em;
+    padding: 1.8rem 3.75rem;
+    font-size: 1.8em;
   }
   /* Увеличиваем размеры конверта */
   .envelope {
     max-width: 100%;
-    margin: 2rem auto;
+    margin: 3rem auto;
   }
   .envelope-body {
-    padding: 2.5rem;
+    padding: 3rem;
   }
+  /* Размеры текста в блоке содержимого письма */
   .letter-content h1 {
-    font-size: 1.8em;
+    font-size: 2em;
   }
   .letter-content p {
-    font-size: 1.3em;
+    font-size: 1.5em;
   }
 }
